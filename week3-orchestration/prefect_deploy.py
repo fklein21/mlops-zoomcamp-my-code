@@ -145,12 +145,6 @@ def train_best_model(train, valid, y_val, dv):
         mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
 
 
-# lr = LinearRegression()
-# lr.fit(X_train, y_train)
-
-# y_pred = lr.predict(X_val)
-
-# mean_squared_error(y_val, y_pred, squared=False)
 
 @flow(task_runner=SequentialTaskRunner())
 def main(train_path: str=str(Path.home())+'/mlops-zoomcamp-my-code/week1-intro-environment/notebooks/data/green_tripdata_2021-01.parquet',
@@ -167,4 +161,24 @@ def main(train_path: str=str(Path.home())+'/mlops-zoomcamp-my-code/week1-intro-e
     train_best_model(train, valid, y_val, dv)
 
 
-main()
+from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import IntervalSchedule
+from prefect.flow_runners import SubprocessFlowRunner
+from datetime import timedelta
+
+DeploymentSpec(
+    flow=main,
+    name="model-training",
+    schedule=IntervalSchedule(interval=timedelta(minutes=5)),
+    flow_runner=SubprocessFlowRunner(),
+    tags=["ml"]
+)
+
+
+
+
+
+
+
+
+
