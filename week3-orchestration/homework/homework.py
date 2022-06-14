@@ -1,4 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from pathlib import Path
+from urllib.request import urlretrieve
+import pickle
 
 import pandas as pd
 
@@ -8,12 +12,38 @@ from sklearn.metrics import mean_squared_error
 
 from prefect import get_run_logger, flow, task
 from prefect.task_runners import SequentialTaskRunner
+from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import CronSchedule
+from prefect.flow_runners import SubprocessFlowRunner
 
 
 @task
 def read_data(path):
     df = pd.read_parquet(path)
     return df
+
+@task
+def download_file(url):
+    logger = get_run_logger()
+    p = Path("data/")
+    p.mkdir(exist_ok=True)
+    file_path = p.resolve().as_posix() + '/' + url.split('/')[-1]
+    logger.info(f"Downloading {url} to directory {file_path.split('/')[:-1]}.")
+    if not Path(file_path).is_file():
+        urlretrieve(url, file_path)
+
+
+def save_model(model, dv, date=None):
+    if date is None:
+        date = datetime.strftime('%Y-%m-%d')
+    p = Path("models/")
+    p.mkdir(exist_ok=True)
+    model_file = p.resolve().as_posix() + '/' + 'model-' + date + '.bin'
+    with open(model_file, 'wb') as f_out:
+        pickle.dump(model, f_out)
+    dv_file = p.resolve().as_posix() + '/' + 'dv-' + date + '.bin'
+    with open(dv_file, 'wb') as f_out:
+        pickle.dump(dv, f_out)
 
 
 @task
@@ -67,18 +97,31 @@ def run_model(df, categorical, dv, lr):
 
 
 @task
-def get_paths(date: datetime) -> list[str]:
-
-    return '', ''
-    pass
+def get_paths(date: str) -> list[str]:
+    logger = get_run_logger()
+    if date is not None:
+        date = datetime.strptime(date, '%Y-%m-%d')
+    else:
+        date = datetime.now().date()
+    logger.info(f"date: {date.strftime('%Y-%m')}")
+    logger.info(f"date 2 months earlier: {(date+relativedelta(months=-2)).strftime('%Y-%m')}")
+    url_base = "https://s3.amazonaws.com/nyc-tlc/trip+data/fhv_tripdata_"
+    train_path = url_base + (date+relativedelta(months=-2)).strftime('%Y-%m') + ".parquet"
+    val_path = url_base + (date+relativedelta(months=-1)).strftime('%Y-%m') + ".parquet"
+    return train_path, val_path
 
 
 @flow(task_runner=SequentialTaskRunner)
-def main(date=None):
+def main(date: str=None):
         # train_path: str = './data/fhv_tripdata_2021-01.parquet', 
         #    val_path: str = './data/fhv_tripdata_2021-02.parquet'):
     
+    logger = get_run_logger()
     train_path, val_path = get_paths(date).result()
+    logger.info(f"train_path: {train_path}, val_path: {val_path}")
+
+    download_file(train_path)
+    download_file(val_path)
 
     categorical = ['PUlocationID', 'DOlocationID']
 
@@ -92,5 +135,21 @@ def main(date=None):
     lr, dv = train_model(df_train_processed, categorical).result()
     run_model(df_val_processed, categorical, dv, lr)
 
+    # save the model and the DictVectorizer
+    save_model(lr, dv, date)
 
-main()
+
+# main(date="2021-08-15")
+
+DeploymentSpec(
+    flow=main,
+    name='cron-schedule-fhv-train-mid-of-month',
+    schedule=CronSchedule(
+        cron="0 9 15 * *",
+        timezone="America/New_York"
+    ),
+    flow_runner=SubprocessFlowRunner(),
+    tags=['ml', 'fhv']
+)
+
+
