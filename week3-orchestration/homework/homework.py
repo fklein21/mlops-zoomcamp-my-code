@@ -139,17 +139,17 @@ def main(date: str=None):
     save_model(lr, dv, date)
 
 
-# main(date="2021-08-15")
+main(date="2021-08-15")
 
-DeploymentSpec(
-    flow=main,
-    name='cron-schedule-fhv-train-mid-of-month',
-    schedule=CronSchedule(
-        cron="0 9 15 * *",
-        timezone="America/New_York"
-    ),
-    flow_runner=SubprocessFlowRunner(),
-    tags=['ml', 'fhv']
-)
+# DeploymentSpec(
+#     flow=main,
+#     name='cron-schedule-fhv-train-mid-of-month',
+#     schedule=CronSchedule(
+#         cron="0 9 15 * *",
+#         timezone="America/New_York"
+#     ),
+#     flow_runner=SubprocessFlowRunner(),
+#     tags=['ml', 'fhv']
+# )
 
 
