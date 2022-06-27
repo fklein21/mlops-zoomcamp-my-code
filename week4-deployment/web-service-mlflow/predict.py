@@ -1,10 +1,19 @@
+from http import client
 import pickle
+
+import mlflow
+from mlflow.tracking import MlflowClient
 
 from flask import Flask, request, jsonify
 
+MLFLOW_TRACKING_URI  = 'http://192.168.122.179:5000'
+RUN_ID = '0085387cffc0432a8ee408dee53bfe38'
 
-with open('lin_reg.bin', 'rb') as f_in:
-    (dv, model) = pickle.load(f_in)
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+
+logged_model = f'runs://{RUN_ID}/model'
+model = mlflow.pyfunc.load_model(logged_model)
+
 
 def prepare_features(ride):
     features = {}
@@ -14,9 +23,8 @@ def prepare_features(ride):
 
 
 def predict(features):
-    X = dv.transform(features)
-    preds = model.predict(X)
-    return preds[0]
+    pred = model.predict(features)
+    return float(preds[0])
 
 
 app = Flask('duration-prediction')
