@@ -1,5 +1,6 @@
 from http import client
 import pickle
+import os
 
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -7,11 +8,13 @@ from mlflow.tracking import MlflowClient
 from flask import Flask, request, jsonify
 
 MLFLOW_TRACKING_URI  = 'http://192.168.122.179:5000'
-RUN_ID = '0085387cffc0432a8ee408dee53bfe38'
+# RUN_ID = '0085387cffc0432a8ee408dee53bfe38'
+RUN_ID = os.getenv('RUN_ID')
 
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 
-logged_model = f'runs://{RUN_ID}/model'
+# logged_model = f'runs:/{RUN_ID}/model'
+logged_model = f's3://mlflow-artifacts-remote-week04/1/{RUN_ID}/artifacts/model'
 model = mlflow.pyfunc.load_model(logged_model)
 
 
@@ -23,7 +26,7 @@ def prepare_features(ride):
 
 
 def predict(features):
-    pred = model.predict(features)
+    preds = model.predict(features)
     return float(preds[0])
 
 
@@ -38,7 +41,8 @@ def predict_endpoint():
     pred = predict(features)
 
     result = {
-        'duration': pred
+        'duration': pred,
+        'model_version': RUN_ID
     }
     print(result)
 
