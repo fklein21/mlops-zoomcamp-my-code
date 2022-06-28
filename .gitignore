@@ -133,6 +133,8 @@ dmypy.json
 mlruns/
 artifacts/
 output/
+mlflow.db
+tmp/
 
 
 
