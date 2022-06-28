@@ -19,6 +19,7 @@ The size of the output file is about 19 MB.
 
  ## Question 3
 
+To convert the Jupyter notebook into a Python script, one can use the following commands:
 ```console
 jupyter nbconvert --to='python' starter.ipynb
 ``` 
@@ -30,56 +31,30 @@ jupyter nbconvert --to script starter.ipynb
 
  ## Question 4
 
- The following Cron expression evaluates to 9 AM every 15th of the month:
-
- `0 9 15 * *`
+The hashes in the Pipfile.lock for the scikit-learn library are:
+```
+"scikit-learn": {
+            "hashes": [
+                "sha256:08ef968f6b72033c16c479c966bf37ccd49b06ea91b765e1cc27afefe723920b",
+                "sha256:158faf30684c92a78e12da19c73feff9641a928a8024b4fa5ec11d583f3d8a87",
+                "sha256:16455ace947d8d9e5391435c2977178d0ff03a261571e67f627c8fee0f9d431a",
+                ...
+            ],
+            "index": "pypi",
+            "version": "==1.0.2"
+        },
+```
 
 
  ## Question 5
 
- After removing the filters for the scheduled flow, the number of upcoming runs was 4.
+The mean predicted duration is 16.298821614015107.
 
 
  ## Question 6
 
-The help flag reveals the following:
-
-```console
-❯ prefect work-queue --help                                      
-Usage: prefect work-queue [OPTIONS] COMMAND [ARGS]...
-
-  Commands for work queue CRUD.
-
-Options:
-  --help  Show this message and exit.
-
-Commands:
-  clear-concurrency-limit  Clear any concurrency limits from a work queue.
-  create                   Create a work queue.
-  delete                   Delete a work queue by ID.
-  inspect                  Inspect a work queue by ID.
-  ls                       View all work queues.
-  pause                    Pause a work queue.
-  preview                  Preview a work queue.
-  resume                   Resume a paused work queue.
-  set-concurrency-limit    Set a concurrency limit on a work queue.
-
-```
-Thus the command `prefect work-queue ls` shows all available work queues:
-
-```console
-❯ prefect work-queue ls                                          
-                                     Work Queues                                     
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
-┃                                   ID ┃ Name                   ┃ Concurrency Limit ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
-│ fbe597d0-0526-4002-950d-3b6579f48184 │ fhv-training-mid-month │ None              │
-│ b8b6d653-a549-48cb-bcec-ebb08cf6c618 │ global                 │ None              │
-└──────────────────────────────────────┴────────────────────────┴───────────────────┘
-                             (**) denotes a paused queue        
-```
+ The mean predicted duration is 9.967573179784523.
 
 
 
-A screenshot of Prefect's radar:
-![](../images/prefect-radar-homework.png)
+
