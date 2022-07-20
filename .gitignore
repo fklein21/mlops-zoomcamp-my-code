@@ -136,6 +136,7 @@ output/
 mlflow.db
 tmp/
 
-
+# Directory added by vscode
+.vscode/
 
 

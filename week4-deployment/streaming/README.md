@@ -128,11 +128,33 @@ docker run -it --rm \
     -e AWS_DEFAULT_REGION="eu-west-1" \
     stream-model-duration:v1
 ```
+With the credentials for AWS
+```bash
+docker build -t stream-model-duration:v1 .
+
+docker run -it --rm \
+    -p 8080:8080 \
+    -e PREDICTIONS_STREAM_NAME="ride_predictions" \
+    -e RUN_ID="8a740ec346824dc49fe2767cc66dfe64" \
+    -e TEST_RUN="True" \
+    -e AWS_DEFAULT_REGION="eu-west-1" \
+    -e AWS_ACCESS_KEY_ID="AWS_ACCESS_KEY_ID" \
+    -e AWS_SECRET_ACCESS_KEY="AWS_SECRET_ACCESS_KEY" \
+    stream-model-duration:v1
+```
 
 URL for testing:
 
 * http://localhost:8080/2015-03-31/functions/function/invocations
 
+docker run -it --rm \
+    -p 8080:8080 \
+    -e PREDICTIONS_STREAM_NAME="ride_predictions" \
+    -e RUN_ID="8a740ec346824dc49fe2767cc66dfe64" \
+    -e TEST_RUN="True" \
+    -e AWS_DEFAULT_REGION="eu-west-1" \
+    -v /home/fklein/.aws:/root/.aws \
+    stream-model-duration:v1
 
 
 ### Configuring AWS CLI to run in Docker
@@ -157,9 +179,10 @@ Alternatively, you can mount the `.aws` folder with your credentials to the `.aw
 docker run -it --rm \
     -p 8080:8080 \
     -e PREDICTIONS_STREAM_NAME="ride_predictions" \
-    -e RUN_ID="e1efc53e9bd149078b0c12aeaa6365df" \
+    -e RUN_ID="8a740ec346824dc49fe2767cc66dfe64" \
     -e TEST_RUN="True" \
-    -v c:/Users/alexe/.aws:/root/.aws \
+    -e AWS_DEFAULT_REGION="eu-west-1" \
+    -v /home/fklein/.aws:/root/.aws \
     stream-model-duration:v1
 ```
 
