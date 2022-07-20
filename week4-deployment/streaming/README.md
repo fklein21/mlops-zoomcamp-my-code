@@ -55,7 +55,7 @@ aws kinesis put-record \
             "DOLocationID": 205,
             "trip_distance": 3.66
         }, 
-        "ride_id": 156
+        "ride_id": 256
     }'
 ```
 
@@ -109,7 +109,7 @@ echo ${RESULT} | jq -r '.Records[0].Data' | base64 --decode
 
 ```bash
 export PREDICTIONS_STREAM_NAME="ride_predictions"
-export RUN_ID="e1efc53e9bd149078b0c12aeaa6365df"
+export RUN_ID="8a740ec346824dc49fe2767cc66dfe64"
 export TEST_RUN="True"
 
 python test.py
@@ -123,7 +123,7 @@ docker build -t stream-model-duration:v1 .
 docker run -it --rm \
     -p 8080:8080 \
     -e PREDICTIONS_STREAM_NAME="ride_predictions" \
-    -e RUN_ID="e1efc53e9bd149078b0c12aeaa6365df" \
+    -e RUN_ID="8a740ec346824dc49fe2767cc66dfe64" \
     -e TEST_RUN="True" \
     -e AWS_DEFAULT_REGION="eu-west-1" \
     stream-model-duration:v1
@@ -203,7 +203,8 @@ $(aws ecr get-login --no-include-email)
 Pushing 
 
 ```bash
-REMOTE_URI="387546586013.dkr.ecr.eu-west-1.amazonaws.com/duration-model"
+REMOTE_URI="repositoryUri"
+REMOTE_URI="318900680121.dkr.ecr.eu-west-1.amazonaws.com/duration-model"
 REMOTE_TAG="v1"
 REMOTE_IMAGE=${REMOTE_URI}:${REMOTE_TAG}
 
