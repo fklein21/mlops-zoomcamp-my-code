@@ -7,8 +7,9 @@ from pymongo import MongoClient
 from flask import Flask, request, jsonify
 
 MODEL_FILE = os.getenv('MODEL_FILE', 'lin_reg.bin')
+
+EVIDENTLY_SERVICE_ADDRESS = os.getenv('EVIDENTLY_SERVICE', 'http://127.0.0.1:5000')
 MONGODB_ADDRESS = os.getenv('MONGODB_ADDRESS', 'mongodb://127.0.0.1:27017')
-EVIDENTLY_SERVICE_ADDRESS = os.getenv('EVIDENTLY_SERVICE_ADDRESS', 'http://127.0.0.1:5000')
 
 with open(MODEL_FILE, 'rb') as f_in:
     dv, model = pickle.load(f_in)
@@ -29,9 +30,8 @@ def predict():
         'duration': float(prediction)
     }
 
-    save_to_db(record, prediction)
-    send_to_evidently_service(record, prediction)
-
+    save_to_db(record, float(prediction))
+    send_to_evidently_service(record, float(prediction))
     return jsonify(result)
 
 
@@ -39,14 +39,12 @@ def save_to_db(record, prediction):
     rec = record.copy()
     rec['prediction'] = prediction
     collection.insert_one(rec)
-    pass
 
 
 def send_to_evidently_service(record, prediction):
     rec = record.copy()
     rec['prediction'] = prediction
-    requests.post(f'{EVIDENTLY_SERVICE_ADDRESS}/iterate/taxi', json=[rec])
-    pass
+    requests.post(f"{EVIDENTLY_SERVICE_ADDRESS}/iterate/taxi", json=[rec])
 
 
 if __name__ == '__main__':
