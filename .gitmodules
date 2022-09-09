@@ -1,0 +1,3 @@
+[submodule "mlops-zoomcamp-capstone-project"]
+	path = mlops-zoomcamp-capstone-project
+	url = git@github.com:fklein21/mlops-zoomcamp-capstone-project.git
